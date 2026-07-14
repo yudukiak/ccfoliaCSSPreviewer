@@ -1,18 +1,57 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { PreviewTarget } from "@/data/cssLists";
+
+const STORAGE_KEY = "ccfolia-css-previewer:field";
+
+type StoredField = {
+  ccfoliaUrl: string;
+  ccfoliaCharacterId: string;
+};
+
+function loadStoredField(): StoredField {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { ccfoliaUrl: "", ccfoliaCharacterId: "" };
+
+    const parsed = JSON.parse(raw) as Partial<StoredField>;
+    return {
+      ccfoliaUrl: typeof parsed.ccfoliaUrl === "string" ? parsed.ccfoliaUrl : "",
+      ccfoliaCharacterId:
+        typeof parsed.ccfoliaCharacterId === "string"
+          ? parsed.ccfoliaCharacterId
+          : "",
+    };
+  } catch {
+    return { ccfoliaUrl: "", ccfoliaCharacterId: "" };
+  }
+}
+
+function saveStoredField(value: StoredField) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
+}
 
 type CcfoliaFieldProps = {
   onPreview: (target: PreviewTarget) => void;
 };
 
 export function CcfoliaField({ onPreview }: CcfoliaFieldProps) {
-  const [ccfoliaUrl, setCcfoliaUrl] = useState("");
-  const [ccfoliaCharacterId, setCcfoliaCharacterId] = useState("");
+  const [ccfoliaUrl, setCcfoliaUrl] = useState(
+    () => loadStoredField().ccfoliaUrl,
+  );
+  const [ccfoliaCharacterId, setCcfoliaCharacterId] = useState(
+    () => loadStoredField().ccfoliaCharacterId,
+  );
 
-  const isUrlOk = /^https:\/\/ccfolia\.com\/rooms\/[^/?#\s]+\/?$/.test(ccfoliaUrl.trim());
+  useEffect(() => {
+    saveStoredField({ ccfoliaUrl, ccfoliaCharacterId });
+  }, [ccfoliaUrl, ccfoliaCharacterId]);
+
+  const isUrlOk = /^https:\/\/ccfolia\.com\/rooms\/[^/?#\s]+\/?$/.test(
+    ccfoliaUrl.trim(),
+  );
   const isCharacterIdOk = /^[a-zA-Z0-9]+$/.test(ccfoliaCharacterId.trim());
   const canPreview = isUrlOk && isCharacterIdOk;
 
