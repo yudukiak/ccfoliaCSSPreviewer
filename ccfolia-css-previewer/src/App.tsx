@@ -1,16 +1,24 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { CcfoliaField } from "@/components/CcfoliaField";
+import { CcfoliaTabs } from "@/components/CcfoliaTabs";
+import type { PreviewTarget } from "@/data/cssLists";
 
 export default function App() {
-  const [count, setCount] = useState(0);
+  const [showTabs, setShowTabs] = useState(false);
+  const [preview, setPreview] = useState<PreviewTarget | null>(null);
 
   return (
-    <>
-      <h1>💖 Hello World!</h1>
-      <p>Welcome to your Electron & React application.</p>
-      <Button onClick={() => setCount((c) => c + 1)}>
-        Click me ({count})
-      </Button>
-    </>
+    <main className="p-6 space-y-4">
+      <section className="space-y-4">
+        <h1 className="text-lg font-medium">ルーム情報</h1>
+        <CcfoliaField
+          onSearch={(target) => {
+            setPreview(target);
+            setShowTabs(true);
+          }}
+        />
+      </section>
+      {showTabs && preview && <CcfoliaTabs preview={preview} />}
+    </main>
   );
 }

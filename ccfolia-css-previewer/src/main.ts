@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain, net } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 
@@ -7,6 +7,19 @@ if (started) {
   app.quit();
 }
 
+ipcMain.handle('fetch-text', async (_event, url: string) => {
+  if (typeof url !== 'string' || !/^https?:\/\//i.test(url)) {
+    throw new Error('Invalid URL');
+  }
+
+  const response = await net.fetch(url);
+  if (!response.ok) {
+    throw new Error(`Fetch failed: ${response.status} ${url}`);
+  }
+
+  return response.text();
+});
+
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -14,6 +27,9 @@ const createWindow = () => {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      webviewTag: true,
+      contextIsolation: true,
+      nodeIntegration: false,
     },
   });
 

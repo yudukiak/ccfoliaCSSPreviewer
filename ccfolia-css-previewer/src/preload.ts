@@ -1,2 +1,5 @@
-// See the Electron documentation for details on how to use preload scripts:
-// https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
+import { contextBridge, ipcRenderer } from 'electron';
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  fetchText: (url: string) => ipcRenderer.invoke('fetch-text', url) as Promise<string>,
+});
