@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { LuCircleCheck, LuCircleX } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { PreviewTarget } from "@/data/cssLists";
-import { cn } from "@/lib/utils";
 
 type CcfoliaFieldProps = {
   onPreview: (target: PreviewTarget) => void;
@@ -19,32 +17,40 @@ export function CcfoliaField({ onPreview }: CcfoliaFieldProps) {
   const canPreview = isUrlOk && isCharacterIdOk;
 
   return (
-    <FieldGroup className="grid grid-cols-[1fr_1fr_100px] gap-4 items-end">
-      <Field orientation="horizontal" className="*:data-[slot=field-label]:flex-none">
+    <FieldGroup className="grid grid-cols-[1fr_1fr_100px] items-end gap-4">
+      <Field
+        data-invalid={!isUrlOk}
+        orientation="horizontal"
+        className="*:data-[slot=field-label]:flex-none *:data-[slot=field-input]:flex-1"
+      >
         <FieldLabel htmlFor="ccfoliaUrl">
-          <ValidationStatusItem ok={isUrlOk}>ルームURL</ValidationStatusItem>
+          ルームURL <span className="text-destructive">*</span>
         </FieldLabel>
         <Input
           id="ccfoliaUrl"
-          className="min-w-0 flex-1"
+          required
           placeholder="https://ccfolia.com/rooms/XXXXX"
           value={ccfoliaUrl}
           onChange={(e) => setCcfoliaUrl(e.target.value)}
-          aria-invalid={ccfoliaUrl.length > 0 && !isUrlOk}
+          aria-invalid={!isUrlOk}
         />
       </Field>
 
-      <Field orientation="horizontal" className="*:data-[slot=field-label]:flex-none">
+      <Field
+        data-invalid={!isCharacterIdOk}
+        orientation="horizontal"
+        className="*:data-[slot=field-label]:flex-none *:data-[slot=field-input]:flex-1"
+      >
         <FieldLabel htmlFor="ccfoliaCharacterId">
-          <ValidationStatusItem ok={isCharacterIdOk}>Character ID</ValidationStatusItem>
+          Character ID <span className="text-destructive">*</span>
         </FieldLabel>
         <Input
           id="ccfoliaCharacterId"
-          className="min-w-0 flex-1"
+          required
           placeholder="英数字のID"
           value={ccfoliaCharacterId}
           onChange={(e) => setCcfoliaCharacterId(e.target.value)}
-          aria-invalid={ccfoliaCharacterId.length > 0 && !isCharacterIdOk}
+          aria-invalid={!isCharacterIdOk}
         />
       </Field>
 
@@ -59,21 +65,5 @@ export function CcfoliaField({ onPreview }: CcfoliaFieldProps) {
         プレビュー
       </Button>
     </FieldGroup>
-  );
-}
-
-interface ValidationStatusItemProps {
-  ok: boolean;
-  children?: React.ReactNode;
-}
-
-function ValidationStatusItem({ ok, children }: ValidationStatusItemProps) {
-  const className = cn("flex items-center gap-2", ok ? "text-green-600" : "text-destructive");
-  const Icon = ok ? LuCircleCheck : LuCircleX;
-  return (
-    <span className={cn("text-sm", className)}>
-      <Icon className="size-4 shrink-0" />
-      {children}
-    </span>
   );
 }
