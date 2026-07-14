@@ -28,7 +28,7 @@ export function CcfoliaTabs({ preview }: CcfoliaTabsProps) {
       className="grid h-full min-h-0 grid-cols-[240px_1fr] grid-rows-1"
     >
       <TabsList className="h-full! w-full! block! bg-transparent p-0">
-        <ScrollArea className="h-full space-y-4 pr-4">
+        <ScrollArea className="h-full space-y-4 p-2 pr-4 border rounded-lg">
           <div className="">
             <p className="px-1 text-sm font-medium text-foreground">公開CSS</p>
             <div className="grid w-full grid-cols-1 gap-1">
@@ -89,19 +89,17 @@ export function CcfoliaTabs({ preview }: CcfoliaTabsProps) {
             <Card className="h-full min-h-0">
               <CardHeader className="shrink-0">
                 <CardTitle>{title}</CardTitle>
-                <CardDescription className="space-x-4">
-                  {hpUrl && (
-                    <p className="inline-flex items-center gap-1">
-                      <FaHome className="size-4 shrink-0" />
-                      <Link href={hpUrl}>{hpUrl}</Link>
-                    </p>
-                  )}
-                  {cssUrl && (
-                    <p className="inline-flex items-center gap-1">
-                      <FaGithub className="size-4 shrink-0" />
-                      <Link href={cssUrl}>{cssUrl}</Link>
-                    </p>
-                  )}
+                <CardDescription>
+                  <ul>
+                    <li>
+                      <FaHome className="inline-block size-4 shrink-0 mr-1" />
+                      {hpUrl ? <Link href={hpUrl}>{hpUrl}</Link> : <span className="text-muted-foreground"></span>}
+                    </li>
+                    <li>
+                      <FaGithub className="inline-block size-4 shrink-0 mr-1" />
+                      {cssUrl ? <Link href={cssUrl}>{cssUrl}</Link> : <span className="text-muted-foreground"></span>}
+                    </li>
+                  </ul>
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex min-h-0 flex-1 flex-col text-sm text-muted-foreground">
@@ -110,7 +108,6 @@ export function CcfoliaTabs({ preview }: CcfoliaTabsProps) {
                     src={previewUrl}
                     cssUrl={cssUrl}
                     extraCss={style}
-                    className="min-h-0 flex-1 w-full rounded-md border"
                   />
                 ) : (
                   <WebviewPlaceholder />
@@ -162,41 +159,36 @@ function ManualCssPanel({
         <CardTitle>{title}</CardTitle>
         {src && <CardDescription className="break-all">{src}</CardDescription>}
       </CardHeader>
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-4">
-        <Field className="shrink-0">
-          <FieldLabel htmlFor={`manual-css-${src ?? "pending"}`}>
-            CSS（ベタ打ち）
-          </FieldLabel>
+      <CardContent className="grid grid-cols-[300px_1fr] gap-4 min-h-0 flex-1">
+        <Field className="h-full">
           <Textarea
-            id={`manual-css-${src ?? "pending"}`}
-            className="min-h-40 font-mono text-xs"
+            className="h-full font-mono text-xs field-sizing-fixed"
             placeholder={"/* 例 */\nbody { background: red !important; }"}
+            wrap="off"
             value={cssText}
             onChange={(e) => onCssTextChange(e.target.value)}
           />
+          <Button
+            className="shrink-0"
+            disabled={!src || !cssText.trim() || applying}
+            onClick={async () => {
+              setApplying(true);
+              try {
+                await webviewRef.current?.applyCss(cssText);
+              } finally {
+                setApplying(false);
+              }
+            }}
+          >
+            {applying ? "挿入中…" : "Webviewに挿入"}
+          </Button>
         </Field>
-
-        <Button
-          className="shrink-0"
-          disabled={!src || !cssText.trim() || applying}
-          onClick={async () => {
-            setApplying(true);
-            try {
-              await webviewRef.current?.applyCss(cssText);
-            } finally {
-              setApplying(false);
-            }
-          }}
-        >
-          {applying ? "挿入中…" : "Webviewに挿入"}
-        </Button>
 
         <div className="flex min-h-0 flex-1 flex-col">
           {src ? (
             <CssWebview
               ref={webviewRef}
               src={src}
-              className="min-h-0 flex-1 w-full rounded-md border"
             />
           ) : (
             <WebviewPlaceholder />
@@ -210,7 +202,7 @@ function ManualCssPanel({
 function WebviewPlaceholder() {
   return (
     <div className="flex min-h-0 flex-1 w-full items-center justify-center rounded-md border bg-muted-foreground text-sm text-background">
-      表示されるよー
+      ココフォリアの盤面が表示されます
     </div>
   );
 }

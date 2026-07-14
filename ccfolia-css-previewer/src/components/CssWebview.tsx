@@ -5,7 +5,7 @@ import {
   useRef,
 } from "react";
 import type { ElectronWebViewElement } from "@/vite-env";
-
+import { cn } from "@/lib/utils";
 const INJECTED_STYLE_ID = "ccfolia-css-previewer-style";
 
 export type CssWebviewHandle = {
@@ -158,6 +158,6 @@ export const CssWebview = forwardRef<CssWebviewHandle, CssWebviewProps>(
       };
     }, [src, cssUrl, extraCss]);
 
-    return <webview ref={webviewRef} src={src} className={className} />;
+    return <webview ref={webviewRef} src={src} className={cn("min-h-0 flex-1 w-full rounded-md border overflow-hidden", className)} />;
   },
 );

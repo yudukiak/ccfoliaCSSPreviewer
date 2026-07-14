@@ -15,7 +15,7 @@ function openVisibleWebviewDevTools() {
 
 export function DevToolsButtons() {
   return (
-    <section className="fixed right-2 bottom-2 z-50 grid grid-cols-2 gap-2">
+    <section className="fixed right-1 bottom-1 z-50 grid grid-cols-2 gap-2">
       <Button
         type="button"
         variant="default"

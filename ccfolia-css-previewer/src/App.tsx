@@ -8,7 +8,7 @@ export default function App() {
   const [preview, setPreview] = useState<PreviewTarget | null>(null);
 
   return (
-    <main className="flex h-dvh flex-col gap-8 p-5">
+    <main className="flex h-dvh flex-col gap-4 p-4">
       <section className="shrink-0">
         <CcfoliaField
           onPreview={(target) => {
