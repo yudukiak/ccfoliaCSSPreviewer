@@ -1,5 +1,7 @@
+import { useRef, useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { LuExternalLink } from "react-icons/lu";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -7,9 +9,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Link } from "@/components/ui/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CssWebview } from "@/components/CssWebview";
+import { Textarea } from "@/components/ui/textarea";
+import { CssWebview, type CssWebviewHandle } from "@/components/CssWebview";
 import { cssLists, type PreviewTarget } from "@/data/cssLists";
 
 const TRIGGER_CLASS_NAME =
@@ -22,6 +26,7 @@ type CcfoliaTabsProps = {
 export function CcfoliaTabs({ preview }: CcfoliaTabsProps) {
   const publishedCssLists = cssLists.filter((list) => list.hpUrl);
   const assetCssLists = cssLists.filter((list) => !list.hpUrl);
+  const [manualCss, setManualCss] = useState("");
 
   return (
     <Tabs defaultValue={publishedCssLists[0]?.title ?? cssLists[0].title}>
@@ -54,6 +59,24 @@ export function CcfoliaTabs({ preview }: CcfoliaTabsProps) {
                   {list.title}
                 </TabsTrigger>
               ))}
+            </div>
+          </div>
+
+          <div className="flex w-full flex-col gap-1.5">
+            <p className="px-1 text-sm font-medium text-foreground">手動</p>
+            <div className="grid w-full grid-cols-4 gap-1">
+              <TabsTrigger
+                value="manual-room"
+                className={TRIGGER_CLASS_NAME}
+              >
+                ルームURL
+              </TabsTrigger>
+              <TabsTrigger
+                value="manual-character"
+                className={TRIGGER_CLASS_NAME}
+              >
+                キャラURL
+              </TabsTrigger>
             </div>
           </div>
         </TabsList>
@@ -97,6 +120,80 @@ export function CcfoliaTabs({ preview }: CcfoliaTabsProps) {
           </TabsContent>
         );
       })}
+
+      <TabsContent value="manual-room">
+        <ManualCssPanel
+          title="手動（ルームURL）"
+          src={preview.roomUrl}
+          cssText={manualCss}
+          onCssTextChange={setManualCss}
+        />
+      </TabsContent>
+
+      <TabsContent value="manual-character">
+        <ManualCssPanel
+          title="手動（キャラURL）"
+          src={preview.characterUrl}
+          cssText={manualCss}
+          onCssTextChange={setManualCss}
+        />
+      </TabsContent>
     </Tabs>
+  );
+}
+
+function ManualCssPanel({
+  title,
+  src,
+  cssText,
+  onCssTextChange,
+}: {
+  title: string;
+  src: string;
+  cssText: string;
+  onCssTextChange: (value: string) => void;
+}) {
+  const webviewRef = useRef<CssWebviewHandle>(null);
+  const [applying, setApplying] = useState(false);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription className="break-all">{src}</CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <Field>
+          <FieldLabel htmlFor={`manual-css-${src}`}>CSS（ベタ打ち）</FieldLabel>
+          <Textarea
+            id={`manual-css-${src}`}
+            className="min-h-40 font-mono text-xs"
+            placeholder={"/* 例 */\nbody { background: red !important; }"}
+            value={cssText}
+            onChange={(e) => onCssTextChange(e.target.value)}
+          />
+        </Field>
+
+        <Button
+          disabled={!cssText.trim() || applying}
+          onClick={async () => {
+            setApplying(true);
+            try {
+              await webviewRef.current?.applyCss(cssText);
+            } finally {
+              setApplying(false);
+            }
+          }}
+        >
+          {applying ? "挿入中…" : "Webviewに挿入"}
+        </Button>
+
+        <CssWebview
+          ref={webviewRef}
+          src={src}
+          className="h-[480px] w-full rounded-md border"
+        />
+      </CardContent>
+    </Card>
   );
 }
