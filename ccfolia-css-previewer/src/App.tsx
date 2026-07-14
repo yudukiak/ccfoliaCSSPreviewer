@@ -1,24 +1,25 @@
 import { useState } from "react";
 import { CcfoliaField } from "@/components/CcfoliaField";
 import { CcfoliaTabs } from "@/components/CcfoliaTabs";
+import { DevToolsButtons } from "@/components/DevToolsButtons";
 import type { PreviewTarget } from "@/data/cssLists";
 
 export default function App() {
-  const [showTabs, setShowTabs] = useState(false);
   const [preview, setPreview] = useState<PreviewTarget | null>(null);
 
   return (
-    <main className="p-6 space-y-4">
-      <section className="space-y-4">
-        <h1 className="text-lg font-medium">ルーム情報</h1>
+    <main className="flex h-dvh flex-col gap-8 p-5">
+      <section className="shrink-0">
         <CcfoliaField
-          onSearch={(target) => {
+          onPreview={(target) => {
             setPreview(target);
-            setShowTabs(true);
           }}
         />
       </section>
-      {showTabs && preview && <CcfoliaTabs preview={preview} />}
+      <section className="min-h-0 flex-1">
+        <CcfoliaTabs preview={preview} />
+      </section>
+      <DevToolsButtons />
     </main>
   );
 }

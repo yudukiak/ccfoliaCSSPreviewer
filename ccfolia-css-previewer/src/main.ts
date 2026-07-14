@@ -26,11 +26,18 @@ ipcMain.handle('fetch-text', async (_event, url: string) => {
   return response.text();
 });
 
+ipcMain.handle('open-devtools', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  win?.webContents.openDevTools();
+});
+
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 960,
+    height: 540,
+    minWidth: 960,
+    minHeight: 540,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       webviewTag: true,

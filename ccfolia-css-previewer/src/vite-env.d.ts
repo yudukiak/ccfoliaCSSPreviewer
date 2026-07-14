@@ -8,12 +8,14 @@ export interface ElectronWebViewElement extends HTMLElement {
     code: string,
     userGesture?: boolean,
   ) => Promise<unknown>;
+  openDevTools: () => void;
 }
 
 declare global {
   interface Window {
     electronAPI: {
       fetchText: (url: string) => Promise<string>;
+      openDevTools: () => Promise<void>;
     };
   }
 }
