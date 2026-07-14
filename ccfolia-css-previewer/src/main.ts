@@ -12,7 +12,13 @@ ipcMain.handle('fetch-text', async (_event, url: string) => {
     throw new Error('Invalid URL');
   }
 
-  const response = await net.fetch(url);
+  const response = await net.fetch(url, {
+    cache: 'no-store',
+    headers: {
+      'Cache-Control': 'no-cache',
+      Pragma: 'no-cache',
+    },
+  });
   if (!response.ok) {
     throw new Error(`Fetch failed: ${response.status} ${url}`);
   }
