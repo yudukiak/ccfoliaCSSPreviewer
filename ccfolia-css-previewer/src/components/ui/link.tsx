@@ -8,7 +8,7 @@ interface LinkProps {
 
 export function Link({ href, className, children }: LinkProps) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={cn("text-destructive underline-offset-4 underline hover:text-destructive/80", className)}>
+    <a href={href} target="_blank" rel="noopener noreferrer" className={cn("text-muted-foreground underline-offset-4 underline hover:text-destructive/80", className)}>
       {children}
     </a>
   );
