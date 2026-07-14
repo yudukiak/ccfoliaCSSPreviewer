@@ -84,3 +84,11 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+// <webview> タグが適用される前に発火するイベント
+app.on('web-contents-created', (_event, contents) => {
+  if (contents.getType() === 'webview') {
+    // <webview> タグにミュートを適用
+    contents.setAudioMuted(true)
+  }
+});
