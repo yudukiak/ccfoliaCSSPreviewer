@@ -45,6 +45,7 @@ const createWindow = () => {
       nodeIntegration: false,
     },
   });
+  mainWindow.setMenu(null);
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
