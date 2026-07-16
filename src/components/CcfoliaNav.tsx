@@ -1,3 +1,4 @@
+import { FaGithub, FaHome } from "react-icons/fa";
 import { useAtom } from "jotai";
 import {
   Accordion,
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/field";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Link } from "@/components/ui/link";
 import {
   assetCssIdsAtom,
   customCssTextAtom,
@@ -76,15 +78,21 @@ export function CcfoliaNav() {
               >
                 {publishedCssLists.map((list) => {
                   const domId = `css-published-${list.id}`;
+                  const Home = list.homepageUrl ? <Link href={list.homepageUrl}><FaHome className="size-4" /></Link> : <span></span>;
+                  const Github = list.cssUrl ? <Link href={list.cssUrl}><FaGithub className="size-4" /></Link> : <span></span>;
                   return (
-                    <FieldLabel htmlFor={domId} key={list.id}>
-                      <Field orientation="horizontal">
-                        <FieldContent>
-                          <FieldTitle>{list.title}</FieldTitle>
-                        </FieldContent>
-                        <RadioGroupItem value={list.id} id={domId} />
-                      </Field>
-                    </FieldLabel>
+                    <div key={list.id} className="grid grid-cols-[1fr_1rem_1rem] items-center gap-1">
+                      <FieldLabel htmlFor={domId}>
+                        <Field orientation="horizontal">
+                          <FieldContent>
+                            <FieldTitle>{list.title}</FieldTitle>
+                          </FieldContent>
+                          <RadioGroupItem value={list.id} id={domId} />
+                        </Field>
+                      </FieldLabel>
+                      {Home}
+                      {Github}
+                    </div>
                   );
                 })}
               </RadioGroup>
@@ -96,7 +104,10 @@ export function CcfoliaNav() {
               <div className="flex flex-col gap-0.5">
                 {assetCssLists.map((list) => {
                   const domId = `css-asset-${list.id}`;
+                  const Home = list.homepageUrl ? <Link href={list.homepageUrl}><FaHome className="size-4" /></Link> : <span></span>;
+                  const Github = list.cssUrl ? <Link href={list.cssUrl}><FaGithub className="size-4" /></Link> : <span></span>;
                   return (
+                    <div key={list.id} className="grid grid-cols-[1fr_1rem_1rem] items-center gap-1">
                     <FieldLabel htmlFor={domId} key={list.id}>
                       <Field orientation="horizontal">
                         <FieldContent>
@@ -114,7 +125,10 @@ export function CcfoliaNav() {
                           }}
                         />
                       </Field>
-                    </FieldLabel>
+                      </FieldLabel>
+                      {Home}
+                      {Github}
+                    </div>
                   );
                 })}
               </div>
