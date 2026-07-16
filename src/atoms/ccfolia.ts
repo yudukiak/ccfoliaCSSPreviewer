@@ -31,3 +31,5 @@ export const ccfoliaCharacterIdAtom = atom(
 export const selectedPublishedTitleAtom = atom(UNSET_PUBLISHED_VALUE);
 
 export const selectedAssetTitlesAtom = atom<string[]>([]);
+
+export const cssTextAtom = atom("");
