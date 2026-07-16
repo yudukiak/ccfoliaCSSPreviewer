@@ -23,14 +23,14 @@ export function DevToolsButtons() {
           void window.electronAPI?.openDevTools();
         }}
       >
-        App DevTools
+        App検証
       </Button>
       <Button
         type="button"
         variant="secondary"
         onClick={openVisibleWebviewDevTools}
       >
-        Web DevTools
+        Web検証
       </Button>
     </section>
   );

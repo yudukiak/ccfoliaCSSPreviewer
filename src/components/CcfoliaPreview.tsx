@@ -41,7 +41,7 @@ export function CcfoliaPreview() {
           {previewUrl ? (
             <CcfoliaPreviewWebview src={previewUrl} cssText={cssSource} />
           ) : (
-            <p>ココフォリアの盤面が表示されます</p>
+            <p>ルームURLとキャラIDを入力すると表示されます</p>
           )}
         </CardContent>
         <CardFooter className="p-4">

@@ -36,14 +36,14 @@ export function CcfoliaCssSourceDialog({
     <Dialog>
       <DialogTrigger
         render={
-          <Button className="mr-0 ml-auto">CSSソースを閲覧する</Button>
+          <Button className="mr-0 ml-auto">カスタムCSSを閲覧する</Button>
         }
       />
       <DialogContent className="flex max-h-[85dvh] w-full max-w-[calc(100%-2rem)] flex-col overflow-hidden sm:max-w-2xl">
         <DialogHeader className="shrink-0">
-          <DialogTitle>CSSソース</DialogTitle>
+          <DialogTitle>カスタムCSS</DialogTitle>
           <DialogDescription>
-            公開CSS・アセット・カスタムCSSをまとめたソースです。コピーして使えます。
+            適用中のCSSです。コピーして使えます。
           </DialogDescription>
         </DialogHeader>
         <div className="relative min-w-0">
@@ -52,6 +52,7 @@ export function CcfoliaCssSourceDialog({
             variant="secondary"
             size="icon"
             className="absolute top-2 right-4 z-10"
+            aria-label="コピー"
             disabled={!cssSource}
             onClick={() => void handleCopy()}
           >

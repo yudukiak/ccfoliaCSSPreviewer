@@ -45,7 +45,7 @@ export function CcfoliaField() {
         className="*:data-[slot=field-label]:flex-none *:data-[slot=field-input]:flex-1"
       >
         <FieldLabel htmlFor="character-id">
-          Character ID <span className="text-destructive">*</span>
+          キャラID <span className="text-destructive">*</span>
         </FieldLabel>
         <Input
           id="character-id"

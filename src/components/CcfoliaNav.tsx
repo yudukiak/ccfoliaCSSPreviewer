@@ -53,7 +53,7 @@ export function CcfoliaNav() {
             className="bg-transparent! border-none"
             value="custom-css"
           >
-            <AccordionTrigger>カスタムCSS</AccordionTrigger>
+            <AccordionTrigger>追加CSS</AccordionTrigger>
             <AccordionContent>
               <Textarea
                 className="h-full font-mono text-xs field-sizing-fixed"
@@ -99,7 +99,7 @@ export function CcfoliaNav() {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem className="bg-transparent! border-none" value="assets">
-            <AccordionTrigger>アセット</AccordionTrigger>
+            <AccordionTrigger>アセットCSS</AccordionTrigger>
             <AccordionContent>
               <div className="flex flex-col gap-0.5">
                 {assetCssLists.map((list) => {
