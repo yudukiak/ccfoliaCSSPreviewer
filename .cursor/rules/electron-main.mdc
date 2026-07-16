@@ -1,0 +1,28 @@
+---
+description: Electron メイン / preload の IPC・セキュリティ
+globs: src/main.ts,src/preload.ts
+alwaysApply: false
+---
+
+# Electron メイン / preload
+
+## セキュリティ
+
+- `contextIsolation: true` / `nodeIntegration: false` を維持する
+- レンダラーへは `preload` の `contextBridge`（`window.electronAPI`）経由のみ公開する
+- 不要な Node 権限や API を広げない
+- `webviewTag: true` はプレビュー用途のため維持する
+
+## IPC
+
+- `ipcMain.handle` を増やすときは、`src/preload.ts` の公開面も同時に更新する
+- 型定義（`src/vite-env.d.ts` 等）も合わせて更新する
+
+## fetch-text
+
+- `https?://` 以外の URL は拒否する現行バリデーションを崩さない（SSRF 対策）
+- ユーザー入力由来 URL を無検証で `net.fetch` しない
+
+## UX
+
+- メニュー非表示（`setMenu(null)`）など既存 UX 方針を勝手に戻さない

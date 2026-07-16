@@ -1,0 +1,40 @@
+---
+description: ccfoliaCSSPreviewer の構成・コマンド・検証方針
+alwaysApply: true
+---
+
+# ccfoliaCSSPreviewer
+
+ココフォリア向けカスタム CSS プレビュー用 Electron アプリ。
+
+## 技術スタック
+
+Electron Forge + Vite + React + TypeScript + Tailwind + jotai + shadcn
+
+## 主な構成
+
+- `src/main.ts`: Electron メインプロセス
+- `src/preload.ts`: preload スクリプト
+- `src/renderer.tsx` / `src/App.tsx`: React レンダラー
+- `src/components/`: UI・プレビュー関連コンポーネント
+- `src/atoms/`: jotai 状態
+- `src/data/`: CSS リスト等のデータ
+- `src/lib/`: ユーティリティ
+- `forge.config.ts` / `vite.*.config.*`: Electron Forge + Vite 設定
+
+## 標準コマンド
+
+- `npm start`: Electron アプリ起動（Forge）
+- `npm run lint`: ESLint（`.ts` / `.tsx`）
+- `npm run package` / `npm run make`: パッケージング / 配布物作成
+
+## 検証
+
+- 専用の typecheck / test スクリプトは `package.json` に無い
+- 検証コマンドを実行した場合のみ「実行済み」と書く
+- 実行していない検証を、実行済みのように書かない
+- UI 確認は原則 `npm start` での目視確認とする
+
+## 関連
+
+- [`.cursor/commands/`](../commands/)（commit / push / Issue 作業ログ）

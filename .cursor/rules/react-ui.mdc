@@ -1,0 +1,29 @@
+---
+description: React レンダラー・jotai・shadcn・Webview プレビュー
+globs: src/components/**/*.tsx,src/App.tsx,src/renderer.tsx,src/atoms/**/*.ts,src/data/**/*.ts
+alwaysApply: false
+---
+
+# React レンダラー / UI
+
+## 状態管理
+
+- 状態は `src/atoms/` の jotai に置く
+- 永続化が必要な値は `atomWithStorage` を使う（既存キー方針に合わせる）
+
+## コンポーネント
+
+- UI プリミティブは `src/components/ui/`（shadcn）
+- アプリ固有コンポーネントは `Ccfolia*` / `CssWebview` 等として `src/components/` に置く
+- パスエイリアス `@/` を使う（`components.json` / `tsconfig` 準拠）
+
+## CSS プレビュー
+
+- CSS 注入・プレビューは `src/components/CssWebview.tsx` 経由で行う
+- 外部 CSS 取得は `window.electronAPI.fetchText` を使う（preload 経由）
+- 公開 CSS リスト等のデータは `src/data/cssLists.ts` を正とする
+
+## スタイリング
+
+- Tailwind を使う
+- className 結合は既存の `cn()`（`src/lib/utils`）を使う
