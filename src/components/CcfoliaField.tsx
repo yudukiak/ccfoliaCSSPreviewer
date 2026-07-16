@@ -2,7 +2,7 @@ import { useAtom } from "jotai";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { ccfoliaCharacterIdAtom, ccfoliaUrlAtom } from "@/atoms/ccfolia";
+import { characterIdAtom, roomUrlAtom } from "@/atoms/ccfolia";
 import type { PreviewTarget } from "@/data/cssLists";
 
 type CcfoliaFieldProps = {
@@ -10,15 +10,13 @@ type CcfoliaFieldProps = {
 };
 
 export function CcfoliaField({ onPreview }: CcfoliaFieldProps) {
-  const [ccfoliaUrl, setCcfoliaUrl] = useAtom(ccfoliaUrlAtom);
-  const [ccfoliaCharacterId, setCcfoliaCharacterId] = useAtom(
-    ccfoliaCharacterIdAtom,
-  );
+  const [roomUrl, setRoomUrl] = useAtom(roomUrlAtom);
+  const [characterId, setCharacterId] = useAtom(characterIdAtom);
 
   const isUrlOk = /^https:\/\/ccfolia\.com\/rooms\/[^/?#\s]+\/?$/.test(
-    ccfoliaUrl.trim(),
+    roomUrl.trim(),
   );
-  const isCharacterIdOk = /^[a-zA-Z0-9]+$/.test(ccfoliaCharacterId.trim());
+  const isCharacterIdOk = /^[a-zA-Z0-9]+$/.test(characterId.trim());
   const canPreview = isUrlOk && isCharacterIdOk;
 
   return (
@@ -28,15 +26,15 @@ export function CcfoliaField({ onPreview }: CcfoliaFieldProps) {
         orientation="horizontal"
         className="*:data-[slot=field-label]:flex-none *:data-[slot=field-input]:flex-1"
       >
-        <FieldLabel htmlFor="ccfoliaUrl">
+        <FieldLabel htmlFor="room-url">
           ルームURL <span className="text-destructive">*</span>
         </FieldLabel>
         <Input
-          id="ccfoliaUrl"
+          id="room-url"
           required
           placeholder="https://ccfolia.com/rooms/XXXXX"
-          value={ccfoliaUrl}
-          onChange={(e) => setCcfoliaUrl(e.target.value)}
+          value={roomUrl}
+          onChange={(e) => setRoomUrl(e.target.value)}
           aria-invalid={!isUrlOk}
         />
       </Field>
@@ -46,15 +44,15 @@ export function CcfoliaField({ onPreview }: CcfoliaFieldProps) {
         orientation="horizontal"
         className="*:data-[slot=field-label]:flex-none *:data-[slot=field-input]:flex-1"
       >
-        <FieldLabel htmlFor="ccfoliaCharacterId">
+        <FieldLabel htmlFor="character-id">
           Character ID <span className="text-destructive">*</span>
         </FieldLabel>
         <Input
-          id="ccfoliaCharacterId"
+          id="character-id"
           required
           placeholder="英数字のID"
-          value={ccfoliaCharacterId}
-          onChange={(e) => setCcfoliaCharacterId(e.target.value)}
+          value={characterId}
+          onChange={(e) => setCharacterId(e.target.value)}
           aria-invalid={!isCharacterIdOk}
         />
       </Field>
@@ -62,9 +60,9 @@ export function CcfoliaField({ onPreview }: CcfoliaFieldProps) {
       <Button
         disabled={!canPreview}
         onClick={() => {
-          const roomUrl = ccfoliaUrl.replace(/\/$/, "");
-          const characterUrl = `${roomUrl}/characters/${ccfoliaCharacterId.trim()}`;
-          onPreview({ roomUrl, characterUrl });
+          const normalizedRoomUrl = roomUrl.replace(/\/$/, "");
+          const characterUrl = `${normalizedRoomUrl}/characters/${characterId.trim()}`;
+          onPreview({ roomUrl: normalizedRoomUrl, characterUrl });
         }}
       >
         プレビュー

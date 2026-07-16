@@ -1,35 +1,37 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+import { UNSET_PUBLISHED_ID } from "@/data/cssLists";
 
-export const UNSET_PUBLISHED_VALUE = "未設定";
-
-type StoredField = {
-  ccfoliaUrl: string;
-  ccfoliaCharacterId: string;
+type StoredPreviewField = {
+  roomUrl: string;
+  characterId: string;
 };
 
-const storedFieldAtom = atomWithStorage<StoredField>(
-  "ccfolia-css-previewer:field",
-  { ccfoliaUrl: "", ccfoliaCharacterId: "" },
+const previewFieldStorageAtom = atomWithStorage<StoredPreviewField>(
+  "ccfolia-css-previewer:v1:field",
+  { roomUrl: "", characterId: "" },
 );
 
-export const ccfoliaUrlAtom = atom(
-  (get) => get(storedFieldAtom).ccfoliaUrl,
-  (get, set, url: string) =>
-    set(storedFieldAtom, { ...get(storedFieldAtom), ccfoliaUrl: url }),
-);
-
-export const ccfoliaCharacterIdAtom = atom(
-  (get) => get(storedFieldAtom).ccfoliaCharacterId,
-  (get, set, id: string) =>
-    set(storedFieldAtom, {
-      ...get(storedFieldAtom),
-      ccfoliaCharacterId: id,
+export const roomUrlAtom = atom(
+  (get) => get(previewFieldStorageAtom).roomUrl,
+  (get, set, roomUrl: string) =>
+    set(previewFieldStorageAtom, {
+      ...get(previewFieldStorageAtom),
+      roomUrl,
     }),
 );
 
-export const selectedPublishedTitleAtom = atom(UNSET_PUBLISHED_VALUE);
+export const characterIdAtom = atom(
+  (get) => get(previewFieldStorageAtom).characterId,
+  (get, set, characterId: string) =>
+    set(previewFieldStorageAtom, {
+      ...get(previewFieldStorageAtom),
+      characterId,
+    }),
+);
 
-export const selectedAssetTitlesAtom = atom<string[]>([]);
+export const publishedCssIdAtom = atom(UNSET_PUBLISHED_ID);
 
-export const cssTextAtom = atom("");
+export const assetCssIdsAtom = atom<string[]>([]);
+
+export const customCssTextAtom = atom("");

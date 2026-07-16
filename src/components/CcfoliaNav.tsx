@@ -1,5 +1,10 @@
 import { useAtom } from "jotai";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -11,11 +16,11 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  cssTextAtom,
-  selectedAssetTitlesAtom,
-  selectedPublishedTitleAtom,
+  assetCssIdsAtom,
+  customCssTextAtom,
+  publishedCssIdAtom,
 } from "@/atoms/ccfolia";
-import { cssLists } from "@/data/cssLists";
+import { assetCssLists, publishedCssLists } from "@/data/cssLists";
 
 const cssPlaceholder = `/* 例 */
 body {
@@ -30,21 +35,22 @@ body {
 `;
 
 export function CcfoliaNav() {
-  const publishedCssLists = cssLists.filter((list) => list.hpUrl !== undefined);
-  const assetCssLists = cssLists.filter((list) => list.hpUrl === undefined);
-  const [cssText, setCssText] = useAtom(cssTextAtom);
-  const [selectedPublishedTitle, setSelectedPublishedTitle] = useAtom(
-    selectedPublishedTitleAtom,
-  );
-  const [selectedAssetTitles, setSelectedAssetTitles] = useAtom(
-    selectedAssetTitlesAtom,
-  );
+  const [customCssText, setCustomCssText] = useAtom(customCssTextAtom);
+  const [publishedCssId, setPublishedCssId] = useAtom(publishedCssIdAtom);
+  const [assetCssIds, setAssetCssIds] = useAtom(assetCssIdsAtom);
 
   return (
     <nav>
       <ScrollArea className="h-full pr-2">
-        <Accordion multiple className="border-none" defaultValue={["公開CSS", "アセット"]}>
-          <AccordionItem className="bg-transparent! border-none" value="カスタムCSS">
+        <Accordion
+          multiple
+          className="border-none"
+          defaultValue={["published", "assets"]}
+        >
+          <AccordionItem
+            className="bg-transparent! border-none"
+            value="custom-css"
+          >
             <AccordionTrigger>カスタムCSS</AccordionTrigger>
             <AccordionContent>
               <Textarea
@@ -52,58 +58,65 @@ export function CcfoliaNav() {
                 placeholder={cssPlaceholder}
                 wrap="off"
                 rows={10}
-                value={cssText}
-                onChange={(e) => setCssText(e.target.value)}
+                value={customCssText}
+                onChange={(e) => setCustomCssText(e.target.value)}
               />
             </AccordionContent>
           </AccordionItem>
-          <AccordionItem className="bg-transparent! border-none" value="公開CSS">
+          <AccordionItem
+            className="bg-transparent! border-none"
+            value="published"
+          >
             <AccordionTrigger>公開CSS</AccordionTrigger>
             <AccordionContent>
               <RadioGroup
-                value={selectedPublishedTitle}
-                onValueChange={setSelectedPublishedTitle}
+                value={publishedCssId}
+                onValueChange={setPublishedCssId}
                 className="gap-0.5"
               >
-                {publishedCssLists.map((list) => (
-                  <FieldLabel htmlFor={list.title} key={list.title}>
-                    <Field orientation="horizontal">
-                      <FieldContent>
-                        <FieldTitle>{list.title}</FieldTitle>
-                      </FieldContent>
-                      <RadioGroupItem value={list.title} id={list.title} />
-                    </Field>
-                  </FieldLabel>
-                ))}
+                {publishedCssLists.map((list) => {
+                  const domId = `css-published-${list.id}`;
+                  return (
+                    <FieldLabel htmlFor={domId} key={list.id}>
+                      <Field orientation="horizontal">
+                        <FieldContent>
+                          <FieldTitle>{list.title}</FieldTitle>
+                        </FieldContent>
+                        <RadioGroupItem value={list.id} id={domId} />
+                      </Field>
+                    </FieldLabel>
+                  );
+                })}
               </RadioGroup>
             </AccordionContent>
           </AccordionItem>
-          <AccordionItem className="bg-transparent! border-none" value="アセット">
+          <AccordionItem className="bg-transparent! border-none" value="assets">
             <AccordionTrigger>アセット</AccordionTrigger>
             <AccordionContent>
               <div className="flex flex-col gap-0.5">
-                {assetCssLists.map((list) => (
-                  <FieldLabel htmlFor={list.title} key={list.title}>
-                    <Field orientation="horizontal">
-                      <FieldContent>
-                        <FieldTitle>{list.title}</FieldTitle>
-                      </FieldContent>
-                      <Checkbox
-                        id={list.title}
-                        checked={selectedAssetTitles.includes(list.title)}
-                        onCheckedChange={(checked) => {
-                          setSelectedAssetTitles(
-                            checked
-                              ? [...selectedAssetTitles, list.title]
-                              : selectedAssetTitles.filter(
-                                (title) => title !== list.title,
-                              ),
-                          );
-                        }}
-                      />
-                    </Field>
-                  </FieldLabel>
-                ))}
+                {assetCssLists.map((list) => {
+                  const domId = `css-asset-${list.id}`;
+                  return (
+                    <FieldLabel htmlFor={domId} key={list.id}>
+                      <Field orientation="horizontal">
+                        <FieldContent>
+                          <FieldTitle>{list.title}</FieldTitle>
+                        </FieldContent>
+                        <Checkbox
+                          id={domId}
+                          checked={assetCssIds.includes(list.id)}
+                          onCheckedChange={(checked) => {
+                            setAssetCssIds(
+                              checked
+                                ? [...assetCssIds, list.id]
+                                : assetCssIds.filter((id) => id !== list.id),
+                            );
+                          }}
+                        />
+                      </Field>
+                    </FieldLabel>
+                  );
+                })}
               </div>
             </AccordionContent>
           </AccordionItem>
