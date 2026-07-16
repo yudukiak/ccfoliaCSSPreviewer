@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import { UNSET_PUBLISHED_ID } from "@/data/cssLists";
+import { UNSET_PUBLISHED_ID, type PreviewTarget } from "@/data/cssLists";
 
 type StoredPreviewField = {
   roomUrl: string;
@@ -29,6 +29,8 @@ export const characterIdAtom = atom(
       characterId,
     }),
 );
+
+export const previewTargetAtom = atom(null as PreviewTarget | null);
 
 export const publishedCssIdAtom = atom(UNSET_PUBLISHED_ID);
 

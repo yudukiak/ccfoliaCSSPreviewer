@@ -3,14 +3,11 @@ import { FaGithub, FaHome } from "react-icons/fa";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/components/ui/link";
 import { CssWebview } from "@/components/CssWebview";
-import { publishedCssIdAtom } from "@/atoms/ccfolia";
-import { getCssListItem, type PreviewTarget } from "@/data/cssLists";
+import { previewTargetAtom, publishedCssIdAtom } from "@/atoms/ccfolia";
+import { getCssListItem } from "@/data/cssLists";
 
-type CcfoliaTabsProps = {
-  preview: PreviewTarget | null;
-};
-
-export function CcfoliaTabs({ preview }: CcfoliaTabsProps) {
+export function CcfoliaTabs() {
+  const preview = useAtomValue(previewTargetAtom);
   const publishedCssId = useAtomValue(publishedCssIdAtom);
   const selectedList = getCssListItem(publishedCssId);
   const { title, homepageUrl, cssUrl, extraCss } = selectedList ?? {

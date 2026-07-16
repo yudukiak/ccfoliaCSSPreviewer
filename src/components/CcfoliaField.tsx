@@ -1,17 +1,17 @@
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { characterIdAtom, roomUrlAtom } from "@/atoms/ccfolia";
-import type { PreviewTarget } from "@/data/cssLists";
+import {
+  characterIdAtom,
+  previewTargetAtom,
+  roomUrlAtom,
+} from "@/atoms/ccfolia";
 
-type CcfoliaFieldProps = {
-  onPreview: (target: PreviewTarget) => void;
-};
-
-export function CcfoliaField({ onPreview }: CcfoliaFieldProps) {
+export function CcfoliaField() {
   const [roomUrl, setRoomUrl] = useAtom(roomUrlAtom);
   const [characterId, setCharacterId] = useAtom(characterIdAtom);
+  const setPreviewTarget = useSetAtom(previewTargetAtom);
 
   const isUrlOk = /^https:\/\/ccfolia\.com\/rooms\/[^/?#\s]+\/?$/.test(
     roomUrl.trim(),
@@ -62,7 +62,7 @@ export function CcfoliaField({ onPreview }: CcfoliaFieldProps) {
         onClick={() => {
           const normalizedRoomUrl = roomUrl.replace(/\/$/, "");
           const characterUrl = `${normalizedRoomUrl}/characters/${characterId.trim()}`;
-          onPreview({ roomUrl: normalizedRoomUrl, characterUrl });
+          setPreviewTarget({ roomUrl: normalizedRoomUrl, characterUrl });
         }}
       >
         プレビュー
