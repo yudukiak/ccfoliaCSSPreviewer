@@ -1,7 +1,6 @@
 import { CcfoliaNav } from "@/components/CcfoliaNav";
 import { CcfoliaField } from "@/components/CcfoliaField";
-import { CcfoliaTabs } from "@/components/CcfoliaTabs";
-import { DevToolsButtons } from "@/components/DevToolsButtons";
+import { CcfoliaPreview } from "@/components/CcfoliaPreview";
 
 export default function App() {
   return (
@@ -9,7 +8,7 @@ export default function App() {
       <CcfoliaNav />
       <article className="grid h-full grid-rows-[auto_minmax(0,1fr)] gap-4">
         <CcfoliaField />
-        <CcfoliaTabs />
+        <CcfoliaPreview />
       </article>
     </main>
   );

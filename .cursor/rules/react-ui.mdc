@@ -14,12 +14,12 @@ alwaysApply: false
 ## コンポーネント
 
 - UI プリミティブは `src/components/ui/`（shadcn）
-- アプリ固有コンポーネントは `Ccfolia*` / `CssWebview` 等として `src/components/` に置く
+- アプリ固有コンポーネントは `Ccfolia*` として `src/components/` に置く
 - パスエイリアス `@/` を使う（`components.json` / `tsconfig` 準拠）
 
 ## CSS プレビュー
 
-- CSS 注入・プレビューは `src/components/CssWebview.tsx` 経由で行う
+- CSS 注入・プレビューは `src/components/CcfoliaPreviewWebview.tsx` 経由で行う
 - 外部 CSS 取得は `window.electronAPI.fetchText` を使う（preload 経由）
 - 公開 CSS リスト等のデータは `src/data/cssLists.ts` を正とする
 
