@@ -6,7 +6,9 @@ import {
 } from "react";
 import type { ElectronWebViewElement } from "@/vite-env";
 import { cn } from "@/lib/utils";
+
 const INJECTED_STYLE_ID = "ccfolia-css-previewer-style";
+const IMPORT_URL_RE = /@import\s+url\(["']([^"']+)["']\)\s*;/g;
 
 export type CssWebviewHandle = {
   applyCss: (css: string) => Promise<void>;
@@ -14,31 +16,44 @@ export type CssWebviewHandle = {
 
 type CssWebviewProps = {
   src: string;
-  cssUrl?: string;
-  extraCss?: string;
+  /** ダイアログ表示と同じソース（@import + 本文）。注入時は @import を展開する */
+  cssText?: string;
   className?: string;
 };
 
-async function loadCssText(cssUrl?: string, extraCss?: string) {
+async function resolveCssTextForInject(cssText: string) {
+  if (!cssText.trim()) return "";
+
+  const urls: string[] = [];
+  const remainder = cssText.replace(
+    new RegExp(IMPORT_URL_RE.source, "g"),
+    (_, url: string) => {
+      urls.push(url);
+      return "";
+    },
+  );
+
   const parts: string[] = [];
 
-  if (cssUrl) {
+  if (urls.length > 0) {
     if (!window.electronAPI?.fetchText) {
       throw new Error("electronAPI.fetchText がありません（preload未読込）");
     }
-    parts.push(await window.electronAPI.fetchText(cssUrl));
+    for (const url of urls) {
+      parts.push(await window.electronAPI.fetchText(url));
+    }
   }
 
-  if (extraCss) {
-    parts.push(extraCss);
+  const rest = remainder.trim();
+  if (rest) {
+    parts.push(rest);
   }
 
   return parts.join("\n");
 }
 
-async function injectCssIntoWebview(
+async function clearInjectedCss(
   webview: ElectronWebViewElement,
-  css: string,
   previousKey: string | null,
 ) {
   if (previousKey) {
@@ -47,6 +62,31 @@ async function injectCssIntoWebview(
     } catch {
       // ignore
     }
+  }
+
+  try {
+    await webview.executeJavaScript(
+      `(() => {
+        const id = ${JSON.stringify(INJECTED_STYLE_ID)};
+        const el = document.getElementById(id);
+        if (el) el.remove();
+        return true;
+      })()`,
+    );
+  } catch {
+    // navigate 中などは無視
+  }
+}
+
+async function injectCssIntoWebview(
+  webview: ElectronWebViewElement,
+  css: string,
+  previousKey: string | null,
+) {
+  await clearInjectedCss(webview, previousKey);
+
+  if (!css.trim()) {
+    return null;
   }
 
   const key = await webview.insertCSS(css);
@@ -70,43 +110,67 @@ async function injectCssIntoWebview(
 }
 
 export const CssWebview = forwardRef<CssWebviewHandle, CssWebviewProps>(
-  function CssWebview({ src, cssUrl, extraCss, className }, ref) {
+  function CssWebview({ src, cssText = "", className }, ref) {
     const webviewRef = useRef<ElectronWebViewElement | null>(null);
     const readyRef = useRef(false);
     const insertedKeyRef = useRef<string | null>(null);
-    const cssPayloadRef = useRef({ cssUrl, extraCss });
-    cssPayloadRef.current = { cssUrl, extraCss };
+    const cssTextRef = useRef(cssText);
+    const injectChainRef = useRef(Promise.resolve());
+    const injectEpochRef = useRef(0);
+    cssTextRef.current = cssText;
 
-    const applyCss = async (css: string, reason: string) => {
-      const webview = webviewRef.current;
-      if (!webview || !css.trim()) return;
+    const enqueueInject = (css: string, reason: string) => {
+      const epoch = ++injectEpochRef.current;
+      const run = async () => {
+        if (epoch !== injectEpochRef.current) return;
 
-      insertedKeyRef.current = await injectCssIntoWebview(
-        webview,
-        css,
-        insertedKeyRef.current,
-      );
-      console.info("[CssWebview] injected", {
-        reason,
-        bytes: css.length,
-        key: insertedKeyRef.current,
-      });
+        const webview = webviewRef.current;
+        if (!webview) return;
+
+        try {
+          const key = await injectCssIntoWebview(
+            webview,
+            css,
+            insertedKeyRef.current,
+          );
+          if (epoch !== injectEpochRef.current) {
+            if (key) {
+              try {
+                await webview.removeInsertedCSS(key);
+              } catch {
+                // ignore
+              }
+            }
+            return;
+          }
+          insertedKeyRef.current = key;
+          console.info("[CssWebview] injected", {
+            reason,
+            bytes: css.length,
+            key,
+          });
+        } catch (error) {
+          if (epoch === injectEpochRef.current) {
+            console.error("[CssWebview] CSS inject failed:", error);
+          }
+        }
+      };
+
+      injectChainRef.current = injectChainRef.current.then(run, run);
+      return injectChainRef.current;
     };
 
     useImperativeHandle(ref, () => ({
       applyCss: async (css: string) => {
-        try {
-          await applyCss(css, "manual");
-        } catch (error) {
-          console.error("[CssWebview] manual inject failed:", error);
-          throw error;
-        }
+        await enqueueInject(css, "manual");
       },
     }));
 
     useEffect(() => {
       readyRef.current = false;
+      // src 変更でページが切り替わると旧 insertCSS は無効になる想定
       insertedKeyRef.current = null;
+      injectEpochRef.current += 1;
     }, [src]);
 
     useEffect(() => {
@@ -115,20 +179,31 @@ export const CssWebview = forwardRef<CssWebviewHandle, CssWebviewProps>(
 
       let cancelled = false;
       const retryTimers: number[] = [];
+      const effectEpoch = ++injectEpochRef.current;
+
+      const clearRetryTimers = () => {
+        for (const timer of retryTimers) window.clearTimeout(timer);
+        retryTimers.length = 0;
+      };
 
       const injectFromProps = async (reason: string) => {
         try {
-          const { cssUrl: url, extraCss: extra } = cssPayloadRef.current;
-          const css = await loadCssText(url, extra);
-          if (cancelled || !css) return;
-          await applyCss(css, reason);
+          const source = cssTextRef.current;
+          const css = await resolveCssTextForInject(source);
+          if (cancelled || effectEpoch !== injectEpochRef.current) return;
+          // cssText が解決中に変わっていたら最新を優先
+          if (source !== cssTextRef.current) return;
+          await enqueueInject(css, reason);
         } catch (error) {
-          console.error("[CssWebview] CSS inject failed:", error);
+          if (!cancelled && effectEpoch === injectEpochRef.current) {
+            console.error("[CssWebview] CSS resolve failed:", error);
+          }
         }
       };
 
       const onReady = () => {
         readyRef.current = true;
+        clearRetryTimers();
         void injectFromProps("ready");
         for (const ms of [500, 1500, 3000]) {
           retryTimers.push(
@@ -150,14 +225,21 @@ export const CssWebview = forwardRef<CssWebviewHandle, CssWebviewProps>(
 
       return () => {
         cancelled = true;
-        for (const timer of retryTimers) window.clearTimeout(timer);
+        clearRetryTimers();
         webview.removeEventListener("dom-ready", onReady);
         webview.removeEventListener("did-finish-load", onReady);
         webview.removeEventListener("did-navigate", onReady);
         webview.removeEventListener("did-navigate-in-page", onReady);
+        injectEpochRef.current += 1;
       };
-    }, [src, cssUrl, extraCss]);
+    }, [src, cssText]);
 
-    return <webview ref={webviewRef} src={src} className={cn("h-full w-full rounded-md border overflow-hidden", className)} />;
+    return (
+      <webview
+        ref={webviewRef}
+        src={src}
+        className={cn("h-full w-full bg-white overflow-hidden", className)}
+      />
+    );
   },
 );

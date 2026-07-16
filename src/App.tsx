@@ -5,15 +5,12 @@ import { DevToolsButtons } from "@/components/DevToolsButtons";
 
 export default function App() {
   return (
-    <>
-      <main className="grid h-dvh grid-cols-[300px_1fr] grid-rows-[minmax(0,1fr)] gap-4 p-4">
-        <CcfoliaNav />
-        <article className="grid h-full grid-rows-[auto_minmax(0,1fr)] gap-4">
-          <CcfoliaField />
-          <CcfoliaTabs />
-        </article>
-      </main>
-      <DevToolsButtons />
-    </>
+    <main className="grid h-dvh grid-cols-[300px_1fr] grid-rows-[minmax(0,1fr)] gap-4 p-4">
+      <CcfoliaNav />
+      <article className="grid h-full grid-rows-[auto_minmax(0,1fr)] gap-4">
+        <CcfoliaField />
+        <CcfoliaTabs />
+      </article>
+    </main>
   );
 }
