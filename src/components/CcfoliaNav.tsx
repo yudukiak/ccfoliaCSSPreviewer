@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useAtom } from "jotai";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Field,
@@ -8,16 +8,22 @@ import {
 } from "@/components/ui/field";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
+import {
+  selectedAssetTitlesAtom,
+  selectedPublishedTitleAtom,
+  UNSET_PUBLISHED_VALUE,
+} from "@/atoms/ccfolia";
 import { cssLists } from "@/data/cssLists";
 
-const UNSET_VALUE = "未設定";
-
 export function CcfoliaNav() {
-  const publishedCssLists = cssLists.filter((list) => list.hpUrl);
-  const assetCssLists = cssLists.filter((list) => !list.hpUrl);
-  const [selectedPublishedTitle, setSelectedPublishedTitle] = useState(UNSET_VALUE);
-  const [selectedAssetTitle, setSelectedAssetTitle] = useState(UNSET_VALUE);
+  const publishedCssLists = cssLists.filter((list) => list.hpUrl !== undefined);
+  const assetCssLists = cssLists.filter((list) => list.hpUrl === undefined);
+  const [selectedPublishedTitle, setSelectedPublishedTitle] = useAtom(
+    selectedPublishedTitleAtom,
+  );
+  const [selectedAssetTitles, setSelectedAssetTitles] = useAtom(
+    selectedAssetTitlesAtom,
+  );
 
   return (
     <nav>
@@ -28,14 +34,6 @@ export function CcfoliaNav() {
           onValueChange={setSelectedPublishedTitle}
           className="gap-0.5"
         >
-          <FieldLabel htmlFor={UNSET_VALUE}>
-            <Field orientation="horizontal">
-              <FieldContent>
-                <FieldTitle>{UNSET_VALUE}</FieldTitle>
-              </FieldContent>
-              <RadioGroupItem value={UNSET_VALUE} id={UNSET_VALUE} />
-            </Field>
-          </FieldLabel>
           {publishedCssLists.map((list) => (
             <FieldLabel htmlFor={list.title} key={list.title}>
               <Field orientation="horizontal">
@@ -48,22 +46,30 @@ export function CcfoliaNav() {
           ))}
         </RadioGroup>
         <h2 className="text-sm font-medium text-foreground">アセット</h2>
-        <RadioGroup
-          value={selectedAssetTitle}
-          onValueChange={setSelectedAssetTitle}
-          className="gap-0.5"
-        >
+        <div className="flex flex-col gap-0.5">
           {assetCssLists.map((list) => (
             <FieldLabel htmlFor={list.title} key={list.title}>
               <Field orientation="horizontal">
                 <FieldContent>
                   <FieldTitle>{list.title}</FieldTitle>
                 </FieldContent>
-                <Checkbox value={list.title} id={list.title} />
+                <Checkbox
+                  id={list.title}
+                  checked={selectedAssetTitles.includes(list.title)}
+                  onCheckedChange={(checked) => {
+                    setSelectedAssetTitles(
+                      checked
+                        ? [...selectedAssetTitles, list.title]
+                        : selectedAssetTitles.filter(
+                            (title) => title !== list.title,
+                          ),
+                    );
+                  }}
+                />
               </Field>
             </FieldLabel>
           ))}
-        </RadioGroup>
+        </div>
       </ScrollArea>
     </nav>
   );

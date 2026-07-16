@@ -1,53 +1,19 @@
-import { useEffect, useState } from "react";
+import { useAtom } from "jotai";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { ccfoliaCharacterIdAtom, ccfoliaUrlAtom } from "@/atoms/ccfolia";
 import type { PreviewTarget } from "@/data/cssLists";
-
-const STORAGE_KEY = "ccfolia-css-previewer:field";
-
-type StoredField = {
-  ccfoliaUrl: string;
-  ccfoliaCharacterId: string;
-};
-
-function loadStoredField(): StoredField {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { ccfoliaUrl: "", ccfoliaCharacterId: "" };
-
-    const parsed = JSON.parse(raw) as Partial<StoredField>;
-    return {
-      ccfoliaUrl: typeof parsed.ccfoliaUrl === "string" ? parsed.ccfoliaUrl : "",
-      ccfoliaCharacterId:
-        typeof parsed.ccfoliaCharacterId === "string"
-          ? parsed.ccfoliaCharacterId
-          : "",
-    };
-  } catch {
-    return { ccfoliaUrl: "", ccfoliaCharacterId: "" };
-  }
-}
-
-function saveStoredField(value: StoredField) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
-}
 
 type CcfoliaFieldProps = {
   onPreview: (target: PreviewTarget) => void;
 };
 
 export function CcfoliaField({ onPreview }: CcfoliaFieldProps) {
-  const [ccfoliaUrl, setCcfoliaUrl] = useState(
-    () => loadStoredField().ccfoliaUrl,
+  const [ccfoliaUrl, setCcfoliaUrl] = useAtom(ccfoliaUrlAtom);
+  const [ccfoliaCharacterId, setCcfoliaCharacterId] = useAtom(
+    ccfoliaCharacterIdAtom,
   );
-  const [ccfoliaCharacterId, setCcfoliaCharacterId] = useState(
-    () => loadStoredField().ccfoliaCharacterId,
-  );
-
-  useEffect(() => {
-    saveStoredField({ ccfoliaUrl, ccfoliaCharacterId });
-  }, [ccfoliaUrl, ccfoliaCharacterId]);
 
   const isUrlOk = /^https:\/\/ccfolia\.com\/rooms\/[^/?#\s]+\/?$/.test(
     ccfoliaUrl.trim(),

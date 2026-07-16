@@ -13,6 +13,11 @@ export type PreviewTarget = {
 export const cssLists: CssListItem[] = [
   // 公開されているCSS
   {
+    title: "未設定",
+    cssUrl: "",
+    hpUrl: "",
+  },
+  {
     title: "盤面のみ",
     cssUrl: "https://yudukiak.github.io/ccfoliaCSS/CSS/board.css",
     hpUrl: "https://ydk.vc/obs-ccfolia-css-board/",
