@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { CcfoliaNav } from "@/components/CcfoliaNav";
 import { CcfoliaField } from "@/components/CcfoliaField";
 import { CcfoliaTabs } from "@/components/CcfoliaTabs";
 import { DevToolsButtons } from "@/components/DevToolsButtons";
@@ -8,18 +9,19 @@ export default function App() {
   const [preview, setPreview] = useState<PreviewTarget | null>(null);
 
   return (
-    <main className="flex h-dvh flex-col gap-4 p-4">
-      <section className="shrink-0">
-        <CcfoliaField
-          onPreview={(target) => {
-            setPreview(target);
-          }}
-        />
-      </section>
-      <section className="min-h-0 flex-1">
-        <CcfoliaTabs preview={preview} />
-      </section>
+    <>
+      <main className="grid h-dvh grid-cols-[240px_1fr] grid-rows-[minmax(0,1fr)] gap-4 p-4">
+        <CcfoliaNav />
+        <article className="grid h-full grid-rows-[auto_minmax(0,1fr)] gap-4">
+          <CcfoliaField
+            onPreview={(target) => {
+              setPreview(target);
+            }}
+          />
+          <CcfoliaTabs preview={preview} />
+        </article>
+      </main>
       <DevToolsButtons />
-    </main>
+    </>
   );
 }

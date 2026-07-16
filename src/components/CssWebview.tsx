@@ -158,6 +158,6 @@ export const CssWebview = forwardRef<CssWebviewHandle, CssWebviewProps>(
       };
     }, [src, cssUrl, extraCss]);
 
-    return <webview ref={webviewRef} src={src} className={cn("min-h-0 flex-1 w-full rounded-md border overflow-hidden", className)} />;
+    return <webview ref={webviewRef} src={src} className={cn("h-full w-full rounded-md border overflow-hidden", className)} />;
   },
 );

@@ -1,9 +1,13 @@
 import { useRef, useState } from "react";
 import { FaGithub, FaHome } from "react-icons/fa";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldContent, FieldDescription, FieldLabel, FieldTitle, } from "@/components/ui/field";
+import { Label } from "@/components/ui/label";
 import { Link } from "@/components/ui/link";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,7 +25,65 @@ export function CcfoliaTabs({ preview }: CcfoliaTabsProps) {
   const publishedCssLists = cssLists.filter((list) => list.hpUrl);
   const assetCssLists = cssLists.filter((list) => !list.hpUrl);
   const [manualCss, setManualCss] = useState("");
+  const [selectedTitle, setSelectedTitle] = useState(
+    publishedCssLists[0]?.title ?? "",
+  );
+  const selectedList =
+    publishedCssLists.find((list) => list.title === selectedTitle) ??
+    publishedCssLists[0];
+  const { title, hpUrl, cssUrl, style } = selectedList ?? {
+    title: "",
+    hpUrl: undefined,
+    cssUrl: "",
+    style: undefined,
+  };
+  const previewUrl = preview
+    ? /status\/main\.css/.test(cssUrl)
+      ? preview.characterUrl
+      : preview.roomUrl
+    : null;
 
+  return (
+      <section className="h-full">
+        <Card className="h-full grid grid-rows-[auto_minmax(0,1fr)]">
+          <CardHeader>
+            <CardTitle>{title}</CardTitle>
+            <CardDescription>
+              <ul>
+                <li>
+                  <FaHome className="inline-block size-4 shrink-0 mr-1" />
+                  {hpUrl ? (
+                    <Link href={hpUrl}>{hpUrl}</Link>
+                  ) : (
+                    <span className="text-muted-foreground"></span>
+                  )}
+                </li>
+                <li>
+                  <FaGithub className="inline-block size-4 shrink-0 mr-1" />
+                  {cssUrl ? (
+                    <Link href={cssUrl}>{cssUrl}</Link>
+                  ) : (
+                    <span className="text-muted-foreground"></span>
+                  )}
+                </li>
+              </ul>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground">
+            {previewUrl ? (
+              <CssWebview
+                src={previewUrl}
+                cssUrl={cssUrl}
+                extraCss={style}
+              />
+            ) : (
+              <WebviewPlaceholder />
+            )}
+          </CardContent>
+        </Card>
+      </section>
+  );
+  /*
   return (
     <Tabs
       defaultValue={publishedCssLists[0]?.title ?? cssLists[0].title}
@@ -31,17 +93,6 @@ export function CcfoliaTabs({ preview }: CcfoliaTabsProps) {
         <ScrollArea className="h-full space-y-4 p-2 pr-4 border rounded-lg">
           <div className="">
             <p className="px-1 text-sm font-medium text-foreground">公開CSS</p>
-            <div className="grid w-full grid-cols-1 gap-1">
-              {publishedCssLists.map((list) => (
-                <TabsTrigger
-                  key={list.title}
-                  value={list.title}
-                  className={TRIGGER_CLASS_NAME}
-                >
-                  {list.title}
-                </TabsTrigger>
-              ))}
-            </div>
           </div>
 
           <div className="">
@@ -137,6 +188,7 @@ export function CcfoliaTabs({ preview }: CcfoliaTabsProps) {
       </TabsContent>
     </Tabs>
   );
+  */
 }
 
 function ManualCssPanel({
@@ -201,7 +253,7 @@ function ManualCssPanel({
 
 function WebviewPlaceholder() {
   return (
-    <div className="flex min-h-0 flex-1 w-full items-center justify-center rounded-md border bg-muted-foreground text-sm text-background">
+    <div className="flex h-full w-full items-center justify-center rounded-md border bg-muted-foreground text-sm text-background">
       ココフォリアの盤面が表示されます
     </div>
   );
