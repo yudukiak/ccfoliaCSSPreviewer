@@ -82,7 +82,7 @@ export function CcfoliaNav() {
                   const Github = list.cssUrl ? <Link href={list.cssUrl}><FaGithub className="size-4" /></Link> : <span></span>;
                   return (
                     <div key={list.id} className="grid grid-cols-[1fr_1rem_1rem] items-center gap-1">
-                      <FieldLabel htmlFor={domId}>
+                      <FieldLabel htmlFor={domId} className="cursor-pointer">
                         <Field orientation="horizontal">
                           <FieldContent>
                             <FieldTitle>{list.title}</FieldTitle>
@@ -108,7 +108,7 @@ export function CcfoliaNav() {
                   const Github = list.cssUrl ? <Link href={list.cssUrl}><FaGithub className="size-4" /></Link> : <span></span>;
                   return (
                     <div key={list.id} className="grid grid-cols-[1fr_1rem_1rem] items-center gap-1">
-                    <FieldLabel htmlFor={domId} key={list.id}>
+                    <FieldLabel htmlFor={domId} key={list.id} className="cursor-pointer">
                       <Field orientation="horizontal">
                         <FieldContent>
                           <FieldTitle>{list.title}</FieldTitle>
