@@ -12,10 +12,19 @@ export interface ElectronWebViewElement extends HTMLElement {
 }
 
 declare global {
+  const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
+  const MAIN_WINDOW_VITE_NAME: string;
+  const LINK_VIEWER_VITE_DEV_SERVER_URL: string;
+  const LINK_VIEWER_VITE_NAME: string;
+
   interface Window {
     electronAPI: {
       fetchText: (url: string) => Promise<string>;
       openDevTools: () => Promise<void>;
+      openLinkDevTools: () => Promise<void>;
+    };
+    linkViewer: {
+      onNavigate: (callback: (url: string) => void) => () => void;
     };
   }
 }

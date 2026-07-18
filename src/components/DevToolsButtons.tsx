@@ -15,7 +15,7 @@ function openVisibleWebviewDevTools() {
 
 export function DevToolsButtons() {
   return (
-    <section className="grid grid-cols-2 gap-2">
+    <section className="grid grid-cols-3 gap-2">
       <Button
         type="button"
         variant="secondary"
@@ -31,6 +31,15 @@ export function DevToolsButtons() {
         onClick={openVisibleWebviewDevTools}
       >
         Web検証
+      </Button>
+      <Button
+        type="button"
+        variant="secondary"
+        onClick={() => {
+          void window.electronAPI?.openLinkDevTools();
+        }}
+      >
+        Link検証
       </Button>
     </section>
   );

@@ -34,11 +34,20 @@ const config: ForgeConfig = {
           config: 'vite.preload.config.ts',
           target: 'preload',
         },
+        {
+          entry: 'src/link-viewer-preload.ts',
+          config: 'vite.preload.config.ts',
+          target: 'preload',
+        },
       ],
       renderer: [
         {
           name: 'main_window',
           config: 'vite.renderer.config.mts',
+        },
+        {
+          name: 'link_viewer',
+          config: 'vite.link-viewer.config.mts',
         },
       ],
     }),
