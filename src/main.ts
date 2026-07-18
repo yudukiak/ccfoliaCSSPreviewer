@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, net } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
+import { initAutoUpdate, registerAutoUpdateIpc } from './auto-update';
 import {
   openOrFocusLinkWindow,
   registerLinkWindowIpc,
@@ -36,6 +37,7 @@ ipcMain.handle('open-devtools', (event) => {
 });
 
 registerLinkWindowIpc();
+registerAutoUpdateIpc();
 
 const createWindow = () => {
   // Create the browser window.
@@ -69,6 +71,8 @@ const createWindow = () => {
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
+
+  initAutoUpdate(mainWindow);
 };
 
 // This method will be called when Electron has finished

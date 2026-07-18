@@ -1,0 +1,139 @@
+name: Build Electron App
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+          - os: macos-latest
+            platform: mac
+          - os: ubuntu-latest
+            platform: linux
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fakeroot dpkg rpm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Make application
+        run: npm run make
+        env:
+          CI: true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.platform }}-build
+          path: out/make/**
+          retention-days: 30
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Get version from package.json
+        id: get_version
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v7
+        with:
+          name: win-build
+          path: release-windows
+
+      - name: Download Mac artifacts
+        uses: actions/download-artifact@v7
+        with:
+          name: mac-build
+          path: release-mac
+
+      - name: Download Linux artifacts
+        uses: actions/download-artifact@v7
+        with:
+          name: linux-build
+          path: release-linux
+
+      - name: Collect release files
+        run: |
+          mkdir -p release-assets
+          # Windows: Squirrel installer + update metadata
+          find release-windows -type f \( \
+            -name "*.exe" -o \
+            -name "*.nupkg" -o \
+            -name "RELEASES" \
+          \) -exec cp -v {} release-assets/ \;
+          # macOS: DMG (install) + ZIP (auto-update)
+          find release-mac -type f \( \
+            -name "*.dmg" -o \
+            -name "*.zip" \
+          \) -exec cp -v {} release-assets/ \;
+          # Linux: Deb / Rpm installers
+          find release-linux -type f \( \
+            -name "*.deb" -o \
+            -name "*.rpm" \
+          \) -exec cp -v {} release-assets/ \;
+          ls -la release-assets
+
+      - name: Generate release notes
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          cat > release-notes.md << EOF
+          ## CCFOLIA CSS Previewer v${VERSION}
+
+          ### ダウンロード
+          - Windows: Setup (.exe) — Squirrel インストーラー
+          - macOS: .dmg（新規インストール）/ .zip（自動更新用）
+          - Linux: .deb / .rpm
+
+          GitHub Releases に公開された成果物は、アプリの自動更新（Windows / macOS）でも利用されます。
+          EOF
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+          body_path: release-notes.md
+          files: release-assets/*
+          fail_on_unmatched_files: true

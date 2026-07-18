@@ -22,6 +22,10 @@ declare global {
       fetchText: (url: string) => Promise<string>;
       openDevTools: () => Promise<void>;
       openLinkDevTools: () => Promise<void>;
+      onUpdateReady: (
+        callback: (payload: { version: string }) => void,
+      ) => () => void;
+      installUpdate: () => Promise<void>;
     };
     linkViewer: {
       onNavigate: (callback: (url: string) => void) => () => void;
