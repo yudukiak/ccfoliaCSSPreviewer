@@ -1,6 +1,6 @@
 ---
 description: Electron メイン / preload の IPC・セキュリティ
-globs: src/main.ts,src/preload.ts
+globs: src/main.ts,src/link-window.ts,src/preload.ts,src/link-viewer-preload.ts
 alwaysApply: false
 ---
 

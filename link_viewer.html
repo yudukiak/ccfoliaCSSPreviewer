@@ -3,20 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <title>リンク</title>
+    <script>
+      const root = document.documentElement;
+      const sync = () => {
+        root.classList.toggle(
+          "dark",
+          window.matchMedia("(prefers-color-scheme: dark)").matches,
+        );
+      };
+      sync();
+      window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .addEventListener("change", sync);
+    </script>
   </head>
-  <script>
-    const root = document.documentElement;
-    const sync = () => {
-      root.classList.toggle(
-        "dark",
-        window.matchMedia("(prefers-color-scheme: dark)").matches,
-      );
-    };
-    sync();
-    window
-      .matchMedia("(prefers-color-scheme: dark)")
-      .addEventListener("change", sync);
-  </script>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/link-viewer/main.tsx"></script>
