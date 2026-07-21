@@ -22,6 +22,11 @@ Electron Forge + Vite + React + TypeScript + Tailwind + jotai + shadcn
 - `src/lib/`: ユーティリティ
 - `forge.config.ts` / `vite.*.config.*`: Electron Forge + Vite 設定
 
+## 開発ランタイム
+
+- Node.js 24.x（`.nvmrc` / `engines`）
+- npm `11.16.0`（`packageManager` / CI と同じ）
+
 ## 標準コマンド
 
 - `npm start`: Electron アプリ起動（Forge）
